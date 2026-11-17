@@ -15,6 +15,7 @@ def train_model():
     if acc < 0.90:
         raise ValueError("Model validation failed")
     joblib.dump(model, "model.pkl")
+    print(f"Model Accuracy: {acc}")
     return model, acc
 
 def test_model_training():
@@ -25,18 +26,24 @@ def test_model_prediction():
     model, _ = train_model()
     assert model.predict([[5.1, 3.5, 1.4, 0.2]])[0] in [0, 1, 2]
 
-try:
-    model = joblib.load("model.pkl")
-except:
-    model, _ = train_model()
+def run_app():
+    try:
+        model = joblib.load("model.pkl")
+    except:
+        model, _ = train_model()
+    st.title("Iris Flower Classification")
+    sl = st.number_input("Sepal Length", 0.0, 10.0, 5.1)
+    sw = st.number_input("Sepal Width", 0.0, 10.0, 3.5)
+    pl = st.number_input("Petal Length", 0.0, 10.0, 1.4)
+    pw = st.number_input("Petal Width", 0.0, 10.0, 0.2)
+    if st.button("Predict"):
+        pred = model.predict([[sl, sw, pl, pw]])[0]
+        classes = ["Setosa", "Versicolor", "Virginica"]
+        st.success(f"Predicted Flower: {classes[pred]}")
 
-st.title("Iris Flower Classification")
-sl = st.number_input("Sepal Length", 0.0, 10.0, 5.1)
-sw = st.number_input("Sepal Width", 0.0, 10.0, 3.5)
-pl = st.number_input("Petal Length", 0.0, 10.0, 1.4)
-pw = st.number_input("Petal Width", 0.0, 10.0, 0.2)
-
-if st.button("Predict"):
-    pred = model.predict([[sl, sw, pl, pw]])[0]
-    classes = ["Setosa", "Versicolor", "Virginica"]
-    st.success(f"Predicted Flower: {classes[pred]}")
+if __name__ == "__main__":
+    import sys
+    if any("streamlit" in arg for arg in sys.argv):
+        run_app()
+    else:
+        train_model()
