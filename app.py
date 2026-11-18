@@ -41,9 +41,7 @@ def run_app():
         classes = ["Setosa", "Versicolor", "Virginica"]
         st.success(f"Predicted Flower: {classes[pred]}")
 
-if __name__ == "__main__":
-    import sys
-    if any("streamlit" in arg for arg in sys.argv):
-        run_app()
-    else:
-        train_model()
+if hasattr(st, "runtime") and st.runtime.exists():
+    run_app()
+elif __name__ == "__main__":
+    train_model()
